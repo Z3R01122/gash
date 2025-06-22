@@ -88,6 +88,12 @@ void load_gashrc() {
                 *eq = 0;
                 setenv(trimmed + 7, eq + 1, 1);
             }
+        } else if (strncmp(trimmed, "gash_prompt=", 12) == 0) {
+            char *val = trimmed + 12;
+            if (*val == '\'' || *val == '"') val++;
+            size_t len = strlen(val);
+            if (len > 0 && (val[len - 1] == '\'' || val[len - 1] == '"')) val[len - 1] = 0;
+            setenv("GASH_PROMPT", val, 1);
         }
     }
     fclose(f);
@@ -96,14 +102,22 @@ void load_gashrc() {
 typedef void (*prompt_func_t)(void);
 
 void default_prompt() {
+    const char *custom = getenv("GASH_PROMPT");
+    if (custom && strlen(custom) > 0) {
+        printf("%s", custom);
+        fflush(stdout);
+        return;
+    }
     char cwd[512];
     if (getcwd(cwd, sizeof(cwd)) == NULL) strcpy(cwd, "?");
     char *base = strrchr(cwd, '/');
     printf("gash:%s$ ", base ? base + 1 : cwd);
+    fflush(stdout);
 }
 
 void windows_prompt() {
     printf("gash> ");
+    fflush(stdout);
 }
 
 prompt_func_t prompt = NULL;
@@ -120,6 +134,14 @@ int parse_input(char *input, char **argv) {
     int argc = 0;
     char *token = strtok(input, " ");
     while (token && argc < MAX_ARGS - 1) {
+        if (token[0] == '~') {
+            const char *home = getenv("HOME");
+            if (home) {
+                static char path[512];
+                snprintf(path, sizeof(path), "%s%s", home, token + 1);
+                token = path;
+            }
+        }
         if (argc == 0) {
             const char *alias_val = find_alias(token);
             if (alias_val) {
@@ -150,6 +172,7 @@ int main() {
     load_gashrc();
 
     while (1) {
+        prompt();
         char *line = readline("");
         if (!line) break;
 
@@ -164,6 +187,32 @@ int main() {
         if (strcmp(input, "exit") == 0) {
             free(line);
             break;
+        }
+
+        if (strcmp(input, "pwd") == 0) {
+            char cwd[512];
+            if (getcwd(cwd, sizeof(cwd)) != NULL) puts(cwd);
+            else perror("pwd");
+            free(line);
+            continue;
+        }
+
+        if (strcmp(input, "clear") == 0) {
+            printf("\033[H\033[J");
+            free(line);
+            continue;
+        }
+
+        if (strcmp(input, "help") == 0) {
+            puts("gash built-in commands:");
+            puts("  cd [dir]        change directory");
+            puts("  alias           list aliases");
+            puts("  export VAR=val  set environment variable");
+            puts("  eval 'cmd'      evaluate a raw command string");
+            puts("  exit            quit the shell");
+            puts("  help            show this help message");
+            free(line);
+            continue;
         }
 
         if (strncmp(input, "cd ", 3) == 0) {
@@ -194,6 +243,14 @@ int main() {
             } else {
                 fprintf(stderr, "export: usage: export VAR=VALUE\n");
             }
+            free(line);
+            continue;
+        }
+
+        if (strncmp(input, "eval ", 5) == 0) {
+            const char *cmd = input + 5;
+            int ret = system(cmd);
+            if (ret == -1) perror("eval");
             free(line);
             continue;
         }
