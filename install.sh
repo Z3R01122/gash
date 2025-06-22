@@ -8,7 +8,7 @@ fi
 set -e
 
 echo "[+] Cloning gash..."
-git clone https://github.com/YOUR_USERNAME/gash.git
+git clone https://github.com/z3r0265return/gash.git
 cd gash
 echo "[+] Initializing gash..."
 gcc -o gash gash.c
