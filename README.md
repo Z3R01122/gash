@@ -64,7 +64,6 @@ alias gs='git status'
 
 - Stay minimal
 - Stay POSIX-like (but not POSIX-compliant)
-- Be simple to read, extend, and hack
 - Avoid bash-style feature bloat
 
 ---
