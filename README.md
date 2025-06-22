@@ -22,8 +22,7 @@ It supports basic command execution, environment variables, aliases, custom prom
 curl -sSL https://raw.githubusercontent.com/z3r0265return/gash/main/install.sh | bash
 ```
 
-> `gash` will be installed to `$HOME/.local/bin/gash` by default.  
-> make sure to add `$HOME/.local/bin` to your `$PATH`.
+> `gash` will be installed to `/usr/local/bin/gash` by default.  
 
 ---
 
