@@ -193,7 +193,7 @@ int parse_input(char *input, char **argv) {
                 continue;
             }
         }
-        argv[argc++] = strdup(token);  // strdup here for all tokens because of the "free(): double free detected in tcache 2" error
+        argv[argc++] = strdup(token);  // strdup all tokens here, no exceptions
         token = strtok(NULL, " ");
     }
     argv[argc] = NULL;
