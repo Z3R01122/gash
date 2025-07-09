@@ -8,7 +8,7 @@ fi
 set -e
 
 echo "[+] Cloning gash..."
-if ! git clone https://github.com/z3r0265return/gash.git; then
+if ! git clone https://github.com/z3r0265return/gash.git ~/gash; then
   echo "[-] failed to clone repo"
   exit 1
 fi
@@ -23,14 +23,14 @@ fi
 
 chmod +x ./gash || { echo "[-] failed to set executable permission"; exit 1; }
 
-if ! sudo mv ./gash /usr/local/bin/; then
-  echo "[-] failed to move gash binary to /usr/local/bin/"
+if ! sudo mv ./gash /usr/bin/; then
+  echo "[-] failed to move gash binary to /usr/bin/"
   exit 1
 fi
 
-if ! grep -q "/usr/local/bin/gash" /etc/shells; then
-  if ! echo "/usr/local/bin/gash" | sudo tee -a /etc/shells > /dev/null; then
-    echo "[-] failed to add /usr/local/bin/gash to /etc/shells"
+if ! grep -q "/usr/bin/gash" /etc/shells; then
+  if ! echo "/usr/bin/gash" | sudo tee -a /etc/shells > /dev/null; then
+    echo "[-] failed to add /usr/bin/gash to /etc/shells"
     exit 1
   fi
 fi
@@ -38,4 +38,4 @@ fi
 echo "[+] done. you can run it with:"
 echo "    gash"
 echo "or set it as your shell with:"
-echo "    chsh -s /usr/local/bin/gash"
+echo "    chsh -s /usr/bin/gash"
