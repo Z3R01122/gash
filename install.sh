@@ -16,7 +16,7 @@ fi
 cd gash || { echo "[-] failed to enter gash directory"; exit 1; }
 
 echo "[+] Initializing gash..."
-if ! gcc -o gash gash.c; then
+if ! gcc -o gash gash.c -lreadline; then
   echo "[-] compilation failed"
   exit 1
 fi

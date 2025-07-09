@@ -24,8 +24,16 @@ run this in your terminal:
 curl -sSL https://raw.githubusercontent.com/z3r0265return/gash/main/install.sh | bash
 ```
 
-by default it installs to `/usr/local/bin/gash`
+by default it installs to `/usr/bin/gash`
 
+the dependencies are:
+gcc
+readline
+git
+bash
+the linux kernel
+a distro
+a pc
 ---
 
 ## configuration
