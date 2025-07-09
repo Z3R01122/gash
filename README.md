@@ -89,6 +89,7 @@ mit license, free and open, no strings attached
 built by [z3r0265return](https://github.com/z3r0265return)  
 not affiliated with gnu or posix, just doing our own thing
 
----
+--- 
+## contributing
 
-if you want me to tweak it more or add anything else, just say.
+you can contribute by making a [pull request](https://github.com/z3r0265return/gash/pulls) or forking it.
