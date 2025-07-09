@@ -47,16 +47,16 @@ void sigint_handler(int signo) {
 }
 
 void save_history() {
-    HIST_ENTRY **history_list = history_list();
-    if (!history_list) return;
+    HIST_ENTRY **hist_list = history_list();
+    if (!hist_list) return;
     char path[512];
     const char *home = getenv("HOME");
     if (!home) return;
     snprintf(path, sizeof(path), "%s/%s", home, HISTORY_FILE);
     FILE *f = fopen(path, "w");
     if (!f) return;
-    for (int i = 0; history_list[i]; i++) {
-        fprintf(f, "%s\n", history_list[i]->line);
+    for (int i = 0; hist_list[i]; i++) {
+        fprintf(f, "%s\n", hist_list[i]->line);
     }
     fclose(f);
 }
