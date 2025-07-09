@@ -31,6 +31,7 @@ by default it installs to `/usr/local/bin/gash`
 ## configuration
 
 create a file called `~/.gashrc` to tweak your setup:
+example:
 
 ```bash
 # set your prompt  
