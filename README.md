@@ -1,88 +1,93 @@
-# gash – the Guess Again Shell
+# gash – the guess again shell
 
-`gash` is a minimal Unix-style shell designed to be simple, clean, and extendable.  
-It supports basic command execution, environment variables, aliases, custom prompts, and `eval`.
-
----
-
-## 🔧 Features
-
-- ✅ Command execution (`ls`, `cd`, `echo`, etc.)
-- ✅ Alias system (`alias ll='ls -l'`)
-- ✅ Environment variable export (`export PATH=/my/bin:$PATH`)
-- ✅ Custom prompt via `.gashrc` or `export gash_prompt`
-- ✅ Eval command (`eval "echo hi && ls"`)
-- ✅ Built-in `cd`, `pwd`, `clear`, `exit`, and `help`
+gash is a minimal unix-style shell built to be simple, clean, and easy to tweak.  
+it runs commands, supports aliases, lets you set environment variables, customize your prompt, and eval raw strings. no bloat, no fuss.
 
 ---
 
-## 📦 Installation
+## features
+
+- command execution (ls, cd, echo, etc)  
+- alias system (alias ll='ls -l')  
+- export environment variables (export path=/my/bin:$path)  
+- custom prompt support via `.gashrc` or `export gash_prompt`  
+- eval support (eval "echo hi && ls")  
+- built-in commands: cd, pwd, clear, exit, help
+
+---
+
+## installation
+
+run this in your terminal:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/z3r0265return/gash/main/install.sh | bash
 ```
 
-> `gash` will be installed to `/usr/local/bin/gash` by default.  
+by default it installs to `/usr/local/bin/gash`
 
 ---
 
-## ⚙️ Configuration
+## configuration
 
-Customize behavior with a `~/.gashrc` file:
+create a file called `~/.gashrc` to tweak your setup:
 
 ```bash
-# set a custom prompt
+# set your prompt  
 gash_prompt="[gash] "
 
-# set environment variables
-export MYVAR="hello"
+# environment variables  
+export myvar="hello"
 
-# set aliases
-alias ll='ls -l'
+# aliases  
+alias ll='ls -l'  
 alias gs='git status'
 ```
 
 ---
 
-## 💻 Built-in Commands
+## built-in commands
 
-| Command      | Description                                |
-|--------------|--------------------------------------------|
-| `cd [dir]`   | Change directory                           |
-| `pwd`        | Print current working directory            |
-| `clear`      | Clear the terminal screen                  |
-| `alias`      | View all aliases                           |
-| `export`     | Set environment variables (`VAR=VAL`)      |
-| `eval`       | Evaluate a raw command string              |
-| `help`       | Show help info                             |
-| `exit`       | Quit the shell                             |
-
----
-
-## 🧠 Goals
-
-- Stay minimal
-- Stay POSIX-like (but not POSIX-compliant)
-- Avoid bash-style feature bloat
+| command  | description                |  
+|----------|----------------------------|  
+| cd [dir] | change directory           |  
+| pwd      | print working directory    |  
+| clear    | clear terminal screen      |  
+| alias    | list all aliases           |  
+| export   | set environment variables  |  
+| eval     | run raw commands           |  
+| help     | show help info             |  
+| exit     | quit the shell             |
 
 ---
 
-## 📁 Project Structure
+## goals
 
-- `gash.c` – main shell implementation (C)
-- `install.sh` – install script
-- `README.md` – this file
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License**.  
-Free software, no nonsense, no restrictions.
+- keep it minimal  
+- stay posix-like (but not strict)  
+- avoid bash-style bloat
 
 ---
 
-## 🙏 Credits
+## project structure
 
-Made with care by [z3r0265return](https://github.com/z3r0265return).  
-Not affiliated with GNU or POSIX — just doing our own thing.
+- gash.c – main shell code  
+- install.sh – install script  
+- readme.md – this file
+
+---
+
+## license
+
+mit license, free and open, no strings attached
+
+---
+
+## credits
+
+built by [z3r0265return](https://github.com/z3r0265return)  
+not affiliated with gnu or posix, just doing our own thing
+
+---
+
+if you want me to tweak it more or add anything else, just say.
