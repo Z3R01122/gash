@@ -12,6 +12,9 @@
 #endif
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
+#include <pwd.h>
 
 #define MAX_LINE 1024
 #define MAX_ARGS 64
@@ -38,6 +41,66 @@ int job_count = 0;
 int is_windows = 0;
 typedef void (*prompt_func_t)(void);
 prompt_func_t prompt = NULL;
+
+static void get_ip(char *ip_buf, size_t size) {
+    struct ifaddrs *ifaddr, *ifa;
+    if (getifaddrs(&ifaddr) == -1) {
+        strncpy(ip_buf, "0.0.0.0", size);
+        return;
+    }
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) continue;
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            if (strcmp(ifa->ifa_name, "lo") == 0) continue;
+            void *addr_ptr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            inet_ntop(AF_INET, addr_ptr, ip_buf, size);
+            freeifaddrs(ifaddr);
+            return;
+        }
+    }
+    freeifaddrs(ifaddr);
+    strncpy(ip_buf, "0.0.0.0", size);
+}
+
+static void build_prompt() {
+    char username[64] = {0};
+    char hostname[64] = {0};
+    char ip[INET_ADDRSTRLEN] = {0};
+    char cwd[512] = {0};
+    char prompt_str[1024] = {0};
+
+    const char *user_env = getenv("USER");
+    if (user_env) strncpy(username, user_env, sizeof(username)-1);
+    else {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw) strncpy(username, pw->pw_name, sizeof(username)-1);
+        else strncpy(username, "unknown", sizeof(username)-1);
+    }
+
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        strncpy(hostname, "unknown", sizeof(hostname)-1);
+    }
+
+    get_ip(ip, sizeof(ip));
+
+    if (!getcwd(cwd, sizeof(cwd))) {
+        strncpy(cwd, "?", sizeof(cwd)-1);
+    } else {
+        const char *home = getenv("HOME");
+        if (home && strncmp(cwd, home, strlen(home)) == 0) {
+            char temp[512];
+            snprintf(temp, sizeof(temp), "~%s", cwd + strlen(home));
+            strncpy(cwd, temp, sizeof(cwd)-1);
+        }
+    }
+
+    uid_t uid = getuid();
+
+    snprintf(prompt_str, sizeof(prompt_str), "\033[1;32m%s@%s@%d@%s@%s> \033[0m",
+        username, hostname, uid, ip, cwd);
+
+    printf("%s", prompt_str);
+}
 
 void sigint_handler(int signo) {
     write(STDOUT_FILENO, "\n", 1);
@@ -110,8 +173,6 @@ void load_gashrc() {
                 if (alias_count < MAX_ALIASES) {
                     strncpy(aliases[alias_count].name, name, sizeof(aliases[alias_count].name) - 1);
                     strncpy(aliases[alias_count].value, val, sizeof(aliases[alias_count].value) - 1);
-                    aliases[alias_count].name[sizeof(aliases[alias_count].name) - 1] = '\0';
-                    aliases[alias_count].value[sizeof(aliases[alias_count].value) - 1] = '\0';
                     alias_count++;
                 }
             }
@@ -137,10 +198,7 @@ void colored_prompt() {
     if (custom && strlen(custom) > 0) {
         printf("\033[1;32m%s\033[0m", custom);
     } else {
-        char cwd[512];
-        if (getcwd(cwd, sizeof(cwd)) == NULL) strcpy(cwd, "?");
-        char *base = strrchr(cwd, '/');
-        printf("\033[1;34mgash:\033[1;33m%s\033[1;34m$\033[0m ", base ? base + 1 : cwd);
+        build_prompt();
     }
     fflush(stdout);
 }
@@ -193,37 +251,37 @@ int parse_input(char *input, char **argv) {
                 continue;
             }
         }
-        argv[argc++] = strdup(token);  // strdup all tokens here, no exceptions
+        argv[argc++] = strdup(token);
         token = strtok(NULL, " ");
     }
     argv[argc] = NULL;
     return argc;
 }
 
-bool handle_builtin(char *input) {
+int handle_builtin(char *input) {
     if (strcmp(input, "exit") == 0) exit(0);
     if (strcmp(input, "pwd") == 0) {
         char cwd[512];
         puts(getcwd(cwd, sizeof(cwd)) ? cwd : "pwd: error");
-        return true;
+        return 1;
     }
     if (strcmp(input, "clear") == 0) {
         printf("\033[H\033[J");
-        return true;
+        return 1;
     }
     if (strcmp(input, "help") == 0) {
         puts("gash builtins: cd alias export eval exit help jobs fg bg time");
-        return true;
+        return 1;
     }
     if (strncmp(input, "cd ", 3) == 0) {
         if (chdir(input + 3) != 0) perror("cd");
-        return true;
+        return 1;
     }
     if (strcmp(input, "alias") == 0) {
         for (int i = 0; i < alias_count; i++) {
             printf("alias %s='%s'\n", aliases[i].name, aliases[i].value);
         }
-        return true;
+        return 1;
     }
     if (strncmp(input, "export ", 7) == 0) {
         char *eq = strchr(input + 7, '=');
@@ -231,17 +289,17 @@ bool handle_builtin(char *input) {
             *eq = '\0';
             setenv(input + 7, eq + 1, 1);
         }
-        return true;
+        return 1;
     }
     if (strncmp(input, "eval ", 5) == 0) {
         system(input + 5);
-        return true;
+        return 1;
     }
     if (strcmp(input, "jobs") == 0) {
         for (int i = 0; i < job_count; i++) {
             printf("[%d] %s %s\n", i, jobs[i].stopped ? "Stopped" : "Running", jobs[i].cmd);
         }
-        return true;
+        return 1;
     }
     if (strncmp(input, "fg %", 4) == 0) {
         int job_num = atoi(input + 4);
@@ -251,7 +309,7 @@ bool handle_builtin(char *input) {
             waitpid(jobs[job_num].pid, NULL, WUNTRACED);
             jobs[job_num].stopped = 0;
         }
-        return true;
+        return 1;
     }
     if (strncmp(input, "bg %", 4) == 0) {
         int job_num = atoi(input + 4);
@@ -259,15 +317,15 @@ bool handle_builtin(char *input) {
             kill(jobs[job_num].pid, SIGCONT);
             jobs[job_num].stopped = 0;
         }
-        return true;
+        return 1;
     }
     if (strncmp(input, "time ", 5) == 0) {
         clock_t start = clock();
         system(input + 5);
         printf("Execution time: %.2fs\n", (double)(clock() - start) / CLOCKS_PER_SEC);
-        return true;
+        return 1;
     }
-    return false;
+    return 0;
 }
 
 void execute_command(char *input, int bg) {
