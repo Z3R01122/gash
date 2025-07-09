@@ -26,6 +26,8 @@ curl -sSL https://raw.githubusercontent.com/z3r0265return/gash/main/install.sh |
 
 by default it installs to `/usr/bin/gash`
 
+keep in mind i tested this on arch linux
+
 the dependencies are:
 gcc
 readline
@@ -34,6 +36,7 @@ bash
 the linux kernel
 a distro
 a pc
+
 ---
 
 ## configuration
