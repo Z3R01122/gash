@@ -76,8 +76,6 @@ alias gs='git status'
 ## goals
 
 - keep it minimal  
-- stay posix-like (but not strict)  
-- avoid bash-style bloat
 
 ---
 
@@ -98,9 +96,9 @@ mit license, free and open, no strings attached
 ## credits
 
 built by [z3r0265return](https://github.com/z3r0265return)  
-not affiliated with gnu or posix, just doing our own thing
 
 --- 
 ## contributing
 
 you can contribute by making a [pull request](https://github.com/z3r0265return/gash/pulls) or forking it.
+
