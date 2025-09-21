@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/z3r0265return/gash)
+
 # gash – the guess again shell
 
 gash is a minimal unix-style shell built to be simple, clean, and easy to tweak.  
