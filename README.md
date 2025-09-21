@@ -1,5 +1,5 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/z3r0265return/gash)
-[GitHub License](https://img.shields.io/github/license/henriquesebastiao/downtify)
+[![GitHub License](https://img.shields.io/github/license/henriquesebastiao/downtify)
 
 # gash – the guess again shell
 
