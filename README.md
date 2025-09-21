@@ -1,5 +1,6 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/z3r0265return/gash)
 ![GitHub License](https://img.shields.io/github/license/z3r0265return/gash)
+![Shell Script](https://img.shields.io/badge/Shell_Script-121011?style=flat&logo=gnu-bash&logoColor=white)
 
 # gash – the guess again shell
 
